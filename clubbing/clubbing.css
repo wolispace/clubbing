@@ -1,0 +1,13 @@
+:root {
+    --font-color: rgba(200, 192, 229, 0.5);
+    --font-color-bold: rgba(200, 192, 229, 1);
+    --bg-color: #1a1621;
+}
+
+html,
+body {
+    background-color:  var(--bg-color);
+    color: var(--font-color);
+    font-family: Tahoma, Verdana, Geneva, sans-serif;
+}
+

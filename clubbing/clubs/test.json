@@ -1,0 +1,115 @@
+{
+    "name": "TEST club",
+    "dateformat": {
+        "month": 1,
+        "dow": 0,
+        "date": 0,
+        "year": 0
+    },
+    "code": "food",
+    "members": [
+        {
+            "name": "Clare"
+        },
+        {
+            "name": "Jennifer"
+        },
+        {
+            "name": "Jane"
+        },
+        {
+            "name": "Kay"
+        },
+        {
+            "name": "Lesley"
+        },
+        {
+            "name": "Nat"
+        },
+        {
+            "name": "Steph"
+        },
+        {
+            "name": "Vaia"
+        },
+        {
+            "name": ""
+        }
+    ],
+    "locations": [
+        "Clare's 28 Essex St N, Goodwood",
+        "Jane's 8 Vernon Crs, Maslin Bch Sth",
+        "Jeniffer's 1\/110 Rose Tce, Wayville",
+        "Kay's 82 Porter St, Parkside",
+        "Lesley's 3\/73 Balham Ave, Kingswood",
+        "Nat's No fixed address",
+        "Vaia's 16 Wooldridge Ave, Millswood"
+    ],
+    "events": {
+        "20260101": {
+            "host": "Steph",
+            "location": "3",
+            "alt": "",
+            "books": [
+                {
+                    "title": "Little book of green",
+                    "by": "",
+                    "url": ""
+                }
+            ]
+        },
+        "20260203": {
+            "host": "Kay",
+            "location": "3",
+            "alt": "",
+            "books": [
+                {
+                    "title": "Book of the white",
+                    "by": "",
+                    "url": ""
+                }
+            ]
+        },
+        "20260520": {
+            "host": "Jennifer",
+            "location": "2",
+            "alt": "",
+            "books": [
+                {
+                    "title": "On the Calculation of Volume",
+                    "by": "Solvej Balle",
+                    "url": "https:\/\/www.goodreads.com\/book\/show\/208511270-on-the-calculation-of-volume-i"
+                },
+                {
+                    "title": "Clear",
+                    "by": "Carys Davies",
+                    "url": "https:\/\/www.goodreads.com\/book\/show\/176443690-clear?ref=nav_sb_ss_4_5"
+                }
+            ]
+        },
+        "20260617": {
+            "host": "Clare",
+            "location": "0",
+            "alt": "",
+            "books": [
+                {
+                    "title": "Placeholder",
+                    "by": "",
+                    "url": ""
+                }
+            ]
+        },
+        "20260715": {
+            "host": "Lesley",
+            "location": "5",
+            "alt": "",
+            "books": [
+                {
+                    "title": "Something",
+                    "by": "",
+                    "url": ""
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,12 @@
+{
+    "name": "Bookclub",
+    "short_name": "Bookclub",
+    "start_url": "/bookclub/",
+    "display": "standalone",
+    "background_color": "#1a1621",
+    "theme_color": "#1a1621",
+    "icons": [
+        { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+        { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+    ]
+}
