@@ -1,44 +1,88 @@
 <?php
+const CLUB_FOLDER = __DIR__ . '/club/';
+const TEMPLATE_FOLDER = __DIR__ . '/template/';
 
-$clubFolder = __DIR__ . '/clubs/';
+if (isset($_GET['j'])) {
+    $data = json_decode($_REQUEST['j'], true);
+    outputJson(handleData($data));
+    exit;
+} else {
+    // regular page load, e.g. /?about-us
+    $urlKeys = array_keys($_GET);
+    $params = [
+        "template" => $urlKeys[0] ?? "page",
+        "version" => rand(10, 99999),
+        "sitename" => "Clubbing",
+        "footer" => '',
+        "content" => formatClubList(getClubs())
+    ];
 
-$clubId = $_REQUEST['c'] ?? '';
-$data = $_REQUEST['d'] ?? '';
-$back = $_REQUEST['b'] ?? date('Ymd');
-$clubId = cleanString($clubId);
+    outputPage($params);
+}
 
-logIt("clubId: {$clubId}, clubFolder: {$clubFolder}");
-outputPage(time());
+// --------------------------------------------------- 
+
+function outputPage($params) {
+    logIt("content " . json_encode($params));
+    $file = buildTemplatePath($params['template']);
+    logIt("loading template {$file}");
+    $html = file_get_contents($file);
+    $html = renderTemplate($html, $params);
+    print $html;
+}
+
+function buildTemplatePath($name) {
+    return TEMPLATE_FOLDER . "{$name}.html";
+}
+
+function renderTemplate($html, $params) {
+    foreach ($params as $key => $value) {
+        $html = str_replace("{{{$key}}}", $value, $html);
+    }
+    return $html;
+}
+
+// $data is a json object with enough info so we know if its loading or saving
+// this always returns a json object
+function handleData($data) {
+    logIt("handling json data: " . json_encode($data));
+    $json = array();
+    switch ($data['action'] ?? '') {
+        case 'list':
+            $json = getClubs();
+            break;
+        case 'delete':
+            $json = deleteSomething($data);
+            break;     
+    };
+    return $json;
+}
 
 function getClubs() {
     $clubs = [];
-    $files = glob('{$clubFolder}_*.json');
-    logIt("files: " . json_encode($files));
+    $files = glob(CLUB_FOLDER . '*.json');
     foreach($files as $file) {
         $clubData = json_decode(file_get_contents($file), true);
-        $clubId = str_replace(["{$clubFolder}_", '.json'], '', $file);
-        $clubs[$clubId] = $clubData['name'];
+        logIt("clubData {$clubData['name']} " . json_encode($clubData));
+        $clubId = str_replace([CLUB_FOLDER , '.json'], '', $file);
+        $clubs[$clubId] = ["name" => $clubData['name'], "tagline" => $clubData['tagline']];
     }
     return $clubs;
 }
 
-function outputPage($v) {
-
-    $clubs = getClubs();
-    $clubList = $clubs == [] ? '' : 'Pick a club' ;
-
-    $files = glob('_*.json');
+function formatClubList($clubs) {
+    $clubList = '';
     foreach($clubs as $clubId => $clubData) {
       $clubList .= "<a href='?$clubId'>{$clubData['name']}</a>";
     }
-
-    $htmlSource = file_get_contents('home.html');
-    $htmlSource = str_replace('{$clubList}', $clubList, $htmlSource);
-    $htmlSource = str_replace('{$v}', $v, $htmlSource);
-    print $htmlSource;
+    logIt("cliblist {$clubList} " . json_encode($clubs));
+    return $clubList;
 
 }
 
+function deleteSomething() {
+
+}
 
 // utilities
 
