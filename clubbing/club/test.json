@@ -1,5 +1,6 @@
 {
     "name": "TEST club",
+    "tagline": "Something",
     "dateformat": {
         "month": 1,
         "dow": 0,

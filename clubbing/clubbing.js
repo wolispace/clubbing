@@ -1,12 +1,11 @@
 // The show starts here
 document.addEventListener('DOMContentLoaded', async () => {
-  const clubList = getJson({});
+  const clubList = await getJson({action: "clubList"});
   console.log(clubList);
 });
 
 async function getJson(params) {
-    fetch(`?j=${JSON.stringify(params)}`).then(result => {
-    if(result.ok) {
-      return result;
-    }});
+    const response = await fetch(`?j=${JSON.stringify(params)}`);
+    const result = await response.json();
+    return result;
 }
