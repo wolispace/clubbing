@@ -1,6 +1,7 @@
 <?php
-const CLUB_FOLDER = __DIR__ . '/club/';
-const TEMPLATE_FOLDER = __DIR__ . '/template/';
+// load global app settings
+$app = loadJson('_data.json');
+$app["webRoot"] = str_replace('index.php', '', $_SERVER['SCRIPT_NAME']);
 
 if (isset($_GET['j'])) {
   $data = json_decode($_REQUEST['j'], true);
@@ -16,26 +17,30 @@ if (isset($_GET['j'])) {
 // --------------------------------------------------- 
 
 function pageParams($params) {
+  global $app;
   // page is the first param ?about etc.. Default page of blank is the 'home' page 
   $params['page'] = $params['page'] ?? '';
   switch ($params['page']) {
-    case '': 
+    case '': // no page so get homeplage content
       $params['content'] = formatClubList(getClubs());
       $params['template'] = 'home';
-      $params['name'] = 'Clubbing';
+      $params['name'] = $app['name'];
+      $params['footer'] = ''; 
       break;
-    default:
+    // new case for each special page   
+    default: // page defined so get its content
       $params['template'] = $params['template'] ?? 'page';
       $params = getContent($params); 
+      $params['footer'] = "<a href='{$app['webRoot']}'>Home</a>";
   };
 
   $params['version'] = rand(10, 99999);
-  $params['footer'] = ''; 
   return $params;
 }
 
 function getContent($params) {
-  $file = CLUB_FOLDER . "{$params['page']}.json";
+  global $app;
+  $file = "{$app['clubFolder']}{$params['page']}.json";
   $data = loadJson($file);
   $params['name'] = $data['name'];
   return $params;
@@ -49,7 +54,8 @@ function outputPage($params) {
 }
 
 function buildTemplatePath($name) {
-  return TEMPLATE_FOLDER . "{$name}.html";
+  global $app;
+  return "{$app['templateFolder']}{$name}.html";
 }
 
 function renderTemplate($html, $params) {
@@ -76,11 +82,12 @@ function handleData($data) {
 }
 
 function getClubs() {
+  global $app;
   $clubs = [];
-  $files = glob(CLUB_FOLDER . '*.json');
+  $files = glob("{$app['clubFolder']}*.json");
   foreach($files as $file) {
     $clubData = loadJson($file);
-    $clubId = str_replace([CLUB_FOLDER , '.json'], '', $file);
+    $clubId = str_replace([$app['clubFolder'] , '.json'], '', $file);
     $clubs[$clubId] = ["name" => $clubData['name'], "tagline" => $clubData['tagline']];
   }
   return $clubs;
@@ -123,6 +130,7 @@ function outputJson($data) {
 }
 
 function loadJson($file) {
+  logIt("loading {$file}");
     return json_decode(file_get_contents($file), true);
 }
 
