@@ -11,7 +11,7 @@ if (isset($_GET['j'])) {
   // regular page load, e.g. /?about-us
   $urlKeys = array_keys($_GET);
   $params = pageParams(["page" => $urlKeys[0] ?? '']);
-  outputPage($params);
+  print buildHtml($params);
 }
 
 // --------------------------------------------------- 
@@ -43,14 +43,55 @@ function getContent($params) {
   $file = "{$app['clubFolder']}{$params['page']}.json";
   $data = loadJson($file);
   $params['name'] = $data['name'];
+  $params['content'] = formatSections($data);
   return $params;
 }
 
-function outputPage($params) {
+function formatSections($data) {
+  global $app;
+  $html = '';
+  // loop through the events and build them from html templates
+  foreach($data[$app['sections']] as $sectionId => $section) {
+    logIt($sectionId . json_encode($section));
+    $section['template'] = 'event';
+    $section = buildDateBits($sectionId, $section);
+    $section['thingHtml'] = buildThings($section);
+    $section['showlocation'] = buildLocation($data['locations'], $section);
+    $html .= buildHtml($section);
+
+  }
+  return $html;
+}
+
+function buildLocation($locations, $section) {
+  return $locations[$section['location']];
+}
+
+function buildDateBits($ymd, $section) {
+  $date = DateTime::createFromFormat('Ymd', $ymd);
+  $dateBits = explode(' ', $date->format('D j M'));
+  $section['weekday'] = $dateBits[0];
+  $section['monthday'] = $dateBits[1];
+  $section['month'] = $dateBits[2];  
+  return $section;
+}
+
+function buildThings($section) {
+  global $app;
+  $html = '';
+  foreach($section['books'] as $thing) {
+    $thing['template'] = 'thing';
+    $thing['link'] = $thing['link'] ?? ''; 
+    $html .= buildHtml($thing);
+  }
+  return $html;
+}
+    
+function buildHtml($params) {
   $file = buildTemplatePath($params['template']);
   $html = file_get_contents($file);
   $html = renderTemplate($html, $params);
-  print $html;
+  return $html;
 }
 
 function buildTemplatePath($name) {
@@ -73,6 +114,12 @@ function handleData($data) {
   switch ($data['action'] ?? '') {
     case 'clubList':
       $json = getClubs();
+      break;
+    case 'load':
+      $json = loadDataForEditing($data);
+      break;
+    case 'save': // builder editing will be form post to handle images and lots of content
+      $json = saveDataFromEditing($data);
       break;
     case 'delete':
       $json = deleteSomething($data);

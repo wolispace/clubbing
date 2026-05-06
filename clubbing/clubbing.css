@@ -22,3 +22,81 @@ a:hover {
     text-decoration: underline;
 
 }
+
+/* events */
+
+
+.schedule {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1rem;    
+}
+
+.event {
+    background-color: rgba(0,0,0,0.25);
+    border-radius: 1rem;
+    display: flex;
+    gap: 0.5rem;
+    position: relative;
+}
+
+.datebox {
+    background-color: rgba(255,255,255,0.15);
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;  
+}
+
+.month {
+    font-size: 200%;
+    color: var(--font-color-bold);
+}
+
+.monthday {
+    font-size: 100%;
+}
+
+.host {
+    font-size:130%;
+    color: var(--font-color-bold);
+}
+
+.bookbox {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.book {
+    padding-right: 2rem;
+}
+
+.title {
+    font-size: 130%;
+    font-weight: bold;
+    color: var(--font-color-bold);
+    padding-top: 0.35rem;
+}
+
+.by {
+    color: var(--font-color-bold);
+
+}
+
+.edit {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    cursor: pointer;
+}
+
+.fas {
+    text-shadow: .0 0 .5rem black;
+}
+
+.fas:hover {
+  color: white;
+}

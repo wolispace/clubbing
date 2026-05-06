@@ -1,7 +1,13 @@
+const clubId = extractClubIdFromUrl();
+
+function extractClubIdFromUrl() {
+  let queryParam = window.location.href;
+  return queryParam.replace(window.location.origin, '').replace('/clubbing/', '').replace('?', '');
+}
+
 // The show starts here
 document.addEventListener('DOMContentLoaded', async () => {
-  const clubList = await getJson({action: "clubList"});
-  console.log(clubList);
+ // sett things up
 });
 
 async function getJson(params) {
