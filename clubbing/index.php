@@ -21,7 +21,7 @@ function pageParams($params) {
   // page is the first param ?about etc.. Default page of blank is the 'home' page 
   $params['page'] = $params['page'] ?? '';
   switch ($params['page']) {
-    case '': // no page so get homeplage content
+    case '': // no page so get homepage content
       $params['content'] = formatClubList(getClubs());
       $params['template'] = 'home';
       $params['name'] = $app['name'];
@@ -42,24 +42,28 @@ function getContent($params) {
   global $app;
   $file = "{$app['clubFolder']}{$params['page']}.json";
   $data = loadJson($file);
-  $params['name'] = $data['name'];
-  $params['content'] = formatSections($data);
+  if (empty($data)) {
+    $params['name'] = 'Club not found';
+    $params['content'] = '';   
+  } else {
+    $params['name'] = $data['name'];
+    $params['content'] = formatSections($data);
+  }
   return $params;
 }
 
 function formatSections($data) {
   global $app;
-  $html = '';
+  $html = '<div class="sections">';
   // loop through the events and build them from html templates
-  foreach($data[$app['sections']] as $sectionId => $section) {
-    logIt($sectionId . json_encode($section));
-    $section['template'] = 'event';
+  foreach($data['sections'] as $sectionId => $section) {
+    $section['template'] = 'section';
     $section = buildDateBits($sectionId, $section);
     $section['thingHtml'] = buildThings($section);
     $section['showlocation'] = buildLocation($data['locations'], $section);
     $html .= buildHtml($section);
-
   }
+  $html .= '</div>';
   return $html;
 }
 
@@ -146,6 +150,36 @@ function formatClubList($clubs) {
     $clubList .= "<a href='?$clubId'>{$clubData['name']}</a>";
   }
   return $clubList;
+}
+
+function loadDataForEditing($params) {
+ global $app;
+  $file = "{$app['clubFolder']}{$params['page']}.json";
+  $data = loadJson($file);
+  if (empty($data)) {
+    return ['error' => 'Club not found'];
+  }
+  // convert date into a YYYYMMDD string
+  $key = toYmd($params['date']);
+  $section = $data['sections'][$key];
+  if (empty($section)) {
+    return ['error' => "section not found {$key}"];
+  } 
+
+  $section['template'] = 'edit_section';
+  $section['buttons'] = buildButtons($params['buttons']);
+  $html = buildHtml($section);
+  
+  return buildHtml($section);
+}
+
+function buildButtons($buttons) {
+  $buttons = '';
+  foreach($buttons as $button) {
+    $section['template'] = 'dialog_button';
+    $buttons .= buildHtml($button);
+  }
+  return $html;
 }
 
 function deleteSomething() {
