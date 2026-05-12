@@ -51,7 +51,7 @@
             "host": "Steph",
             "location": "3",
             "alt": "",
-            "books": [
+            "things": [
                 {
                     "title": "Little book of green",
                     "by": "",
@@ -63,7 +63,7 @@
             "host": "Kay",
             "location": "3",
             "alt": "",
-            "books": [
+            "things": [
                 {
                     "title": "Book of the white",
                     "by": "",
@@ -75,7 +75,7 @@
             "host": "Jennifer",
             "location": "2",
             "alt": "",
-            "books": [
+            "things": [
                 {
                     "title": "On the Calculation of Volume",
                     "by": "Solvej Balle",
@@ -92,7 +92,7 @@
             "host": "Clare",
             "location": "0",
             "alt": "",
-            "books": [
+            "things": [
                 {
                     "title": "Placeholder",
                     "by": "",
@@ -104,7 +104,7 @@
             "host": "Lesley",
             "location": "5",
             "alt": "",
-            "books": [
+            "things": [
                 {
                     "title": "Something",
                     "by": "",

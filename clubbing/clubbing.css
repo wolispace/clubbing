@@ -97,3 +97,72 @@ a:hover {
 .fas:hover {
   color: white;
 }
+
+
+.dialog {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 80%;
+
+    background-color: rgb(53 51 64);
+    border-radius: 1rem;
+    box-shadow: 1rem 1rem 2rem rgba(0,0,0,0.5);
+    padding: 1rem;
+    margin: 1rem;
+    z-index: 2;
+    max-width: 500px;
+}
+
+.dialog.visible {
+    display: block;
+}
+
+.dialog-close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.75rem;
+    cursor: pointer;
+    font-size: 120%;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+.overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 2;
+}
+
+.overlay.visible { 
+  display: block; 
+}
+
+.dialogbuttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.button {
+    background-color: rgb(54, 64, 85);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.25rem;
+    border-top: 3px solid rgb(255, 255, 255, .25);
+    border-right: 3px solid rgb(0, 0, 0, .45);
+    border-bottom: 3px solid rgb(0, 0, 0, .45);
+    border-left: 3px solid rgb(255, 255, 255, .25);
+    font-size: 110%;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: rgb(119, 142, 189);
+}

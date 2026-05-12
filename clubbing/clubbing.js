@@ -5,10 +5,21 @@ function extractClubIdFromUrl() {
   return queryParam.replace(window.location.origin, '').replace('/clubbing/', '').replace('?', '');
 }
 
-function editSection(section) {
-  const params = {page: clubId, section: section}
-  const json = getJson(params);
-  showDialog(json.html, json.buttons);
+async function editSection(section) {
+  const buttons = [
+    {caption: "Delete", 
+      onclick: "deleteSection()",
+    },
+    {caption: "Save", 
+      onclick: "saveSection()",
+    },
+    {caption: "Cancel", 
+      onclick: "closeDialog()",
+    }
+  ];
+  const params = {action: 'load', page: clubId, section: section, buttons: buttons}
+  const json = await getJson(params);
+  showDialog(json.html);
 }
 
 // The show starts here
@@ -22,17 +33,15 @@ async function getJson(params) {
     return result;
 }
 
-function showDialog(html, params) {
+function showDialog(html) {
+  console.log(html);
   window.scrollTo({ top: 0, behavior: 'smooth' });
   document.querySelector('.overlay').classList.add('visible');
   const dialog = document.querySelector('.dialog');
 
-  let buttons = buildDialogButtons(params);
-
   dialog.innerHTML = `<div class="dialog-close" 
   onclick="closeDialog()"><i class="fas fa-close"></i></div>
-  ${html}
-  ${buttons}`;
+  ${html}`;
   dialog.classList.add('visible');
 }
 
@@ -41,20 +50,3 @@ function closeDialog() {
   document.querySelector('.dialog').classList.remove('visible');
 }
 
-function buildDialogButtons(params) {
-  let html = `<div class="dialogbuttons">`;
-  if (params?.delete == 1) {
-    html += `<div class="button" onclick="deleteForm()">Delete</div>`;
-  }
-  if (params?.close == 1) {
-    html += `<div class="button" onclick="closeDialog()">Close</div>`;
-  } 
-  if (params?.cancel == 1) {
-    html += `<div class="button" onclick="closeDialog()">Cancel</div>`;
-  }
-  if (params?.save == 1) {
-    html += `<div class="button" onclick="saveForm()">Save</div>`;
-  }
-  html += '</div>';
-  return html;
-}

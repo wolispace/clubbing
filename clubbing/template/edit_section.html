@@ -1,12 +1,16 @@
 <form>
+  <input type="hidden" id="sectionId" name="sectionId" value="{{sectionId}}"
   <label for="date">Date</label>
   <input type="text" name="date" id="date" value="{{date}}" />
-  <label for="title">Title</label>
   <select id="host" name="host">
     {{hosts}}
   </select>
   <label for="location">Location</label>
-  <select name="by" id="by">
+  <select name="location" id="location">
     {{locations}}
   </select>
+  <label for="alt">alt</label>
+  <input type="text" name="alt" id="alt" value="{{alt}}" />  
+  {{things}}
 </form>
+{{buttons}}

@@ -57,9 +57,10 @@ function formatSections($data) {
   $html = '<div class="sections">';
   // loop through the events and build them from html templates
   foreach($data['sections'] as $sectionId => $section) {
+    $section['sectionId'] = $sectionId;
     $section['template'] = 'section';
     $section = buildDateBits($sectionId, $section);
-    $section['thingHtml'] = buildThings($section);
+    $section['thingHtml'] = buildSubHtml($section['things'], 'thing');
     $section['showlocation'] = buildLocation($data['locations'], $section);
     $html .= buildHtml($section);
   }
@@ -80,12 +81,11 @@ function buildDateBits($ymd, $section) {
   return $section;
 }
 
-function buildThings($section) {
+function buildSubHtml($list, $template) {
   global $app;
   $html = '';
-  foreach($section['books'] as $thing) {
-    $thing['template'] = 'thing';
-    $thing['link'] = $thing['link'] ?? ''; 
+  foreach($list as $thing) {
+    $thing['template'] = $template;
     $html .= buildHtml($thing);
   }
   return $html;
@@ -95,6 +95,8 @@ function buildHtml($params) {
   $file = buildTemplatePath($params['template']);
   $html = file_get_contents($file);
   $html = renderTemplate($html, $params);
+  // remove all left-over {{vars}}
+  $html = preg_replace('/{{\w+}}/', '', $html);
   return $html;
 }
 
@@ -159,25 +161,24 @@ function loadDataForEditing($params) {
   if (empty($data)) {
     return ['error' => 'Club not found'];
   }
-  // convert date into a YYYYMMDD string
-  $key = toYmd($params['date']);
-  $section = $data['sections'][$key];
+  $section = $data['sections'][$section['sectionId']];
   if (empty($section)) {
-    return ['error' => "section not found {$key}"];
+    // default section details like next date
+    $section = ['date' => '01 May 2026'];
   } 
+  $section['sectionId'] = $params['section'];
 
   $section['template'] = 'edit_section';
-  $section['buttons'] = buildButtons($params['buttons']);
-  $html = buildHtml($section);
-  
-  return buildHtml($section);
+  $section['buttons'] = buildSubHtml($params['buttons'], 'dialog_button');
+  $section['things'] = buildSubHtml($params['things'], 'edit_things');
+  return ['html'=> buildHtml($section)];
 }
 
 function buildButtons($buttons) {
-  $buttons = '';
+  $html = '';
   foreach($buttons as $button) {
-    $section['template'] = 'dialog_button';
-    $buttons .= buildHtml($button);
+    $button['template'] = 'dialog_button';
+    $html .= buildHtml($button);
   }
   return $html;
 }
