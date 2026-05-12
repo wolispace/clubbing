@@ -8,35 +8,9 @@
         "year": 0
     },
     "code": "food",
-    "members": [
-        {
-            "name": "Clare"
-        },
-        {
-            "name": "Jennifer"
-        },
-        {
-            "name": "Jane"
-        },
-        {
-            "name": "Kay"
-        },
-        {
-            "name": "Lesley"
-        },
-        {
-            "name": "Nat"
-        },
-        {
-            "name": "Steph"
-        },
-        {
-            "name": "Vaia"
-        },
-        {
-            "name": ""
-        }
-    ],
+    "sectionCaption": "event",
+    "thingCaption": "book",
+    "members": ["Clare","Jennifer","Jane","Kay","Lesley","Nat","Steph","Vaia"],
     "locations": [
         "Clare's 28 Essex St N, Goodwood",
         "Jane's 8 Vernon Crs, Maslin Bch Sth",

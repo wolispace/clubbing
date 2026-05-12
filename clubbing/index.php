@@ -60,7 +60,7 @@ function formatSections($data) {
     $section['sectionId'] = $sectionId;
     $section['template'] = 'section';
     $section = buildDateBits($sectionId, $section);
-    $section['thingHtml'] = buildSubHtml($section['things'], 'thing');
+    $section['things'] = buildSubHtml($section['things'], 'thing');
     $section['showlocation'] = buildLocation($data['locations'], $section);
     $html .= buildHtml($section);
   }
@@ -84,8 +84,10 @@ function buildDateBits($ymd, $section) {
 function buildSubHtml($list, $template) {
   global $app;
   $html = '';
+  $counter = 0;
   foreach($list as $thing) {
     $thing['template'] = $template;
+    $thing['id'] = $counter++;
     $html .= buildHtml($thing);
   }
   return $html;
@@ -161,17 +163,30 @@ function loadDataForEditing($params) {
   if (empty($data)) {
     return ['error' => 'Club not found'];
   }
-  $section = $data['sections'][$section['sectionId']];
+  $section = $data['sections'][$params['section']];
   if (empty($section)) {
     // default section details like next date
-    $section = ['date' => '01 May 2026'];
+    $section = ['date' => '02 May 2026'];
   } 
-  $section['sectionId'] = $params['section'];
-
-  $section['template'] = 'edit_section';
+  
+  $section = array_merge($section, $data);
+  $section['section'] = $params['section'];
+  $section['date'] = fromYmd($section['section']);
+  $section['hosts'] = buildOptions($data['members'], $section['host']); 
+  $section['locations'] = buildOptions($data['locations'], $section['location']); 
   $section['buttons'] = buildSubHtml($params['buttons'], 'dialog_button');
-  $section['things'] = buildSubHtml($params['things'], 'edit_things');
+  $section['things'] = buildSubHtml($section['things'], 'edit_thing');
+  $section['template'] = 'edit_section';
   return ['html'=> buildHtml($section)];
+}
+
+function buildOptions($list, $selected) {
+  $html = '';
+  foreach( $list as $item) {
+    $selected = $item == $selectedd ? 'selected' : '';
+    $html .= "<option value='{$item}' {$selected}>{$item}</option>";
+  }
+  return $html;
 }
 
 function buildButtons($buttons) {
@@ -194,6 +209,10 @@ function toYmd($str) {
     $date = DateTime::createFromFormat($format, $str);
     if ($date) return $date->format('Ymd');
   }
+}
+function fromYmd($ymd) {
+  $date = DateTime::createFromFormat('Ymd', $ymd);
+  return $date->format('d M Y');
 }
 
 function logIt($str) {

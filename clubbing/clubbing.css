@@ -166,3 +166,13 @@ form {
 .button:hover {
     background-color: rgb(119, 142, 189);
 }
+
+.thing {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 0;
+}
+
+input, select {
+  font-size: 110%;
+}

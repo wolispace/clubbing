@@ -1,7 +1,8 @@
 <form>
-  <input type="hidden" id="sectionId" name="sectionId" value="{{sectionId}}"
+  <input type="hidden" id="section" name="section" value="{{section}}" />
   <label for="date">Date</label>
   <input type="text" name="date" id="date" value="{{date}}" />
+  <label for="host">Host</label>
   <select id="host" name="host">
     {{hosts}}
   </select>
@@ -9,8 +10,11 @@
   <select name="location" id="location">
     {{locations}}
   </select>
-  <label for="alt">alt</label>
+  <label for="alt">Alternate location</label>
   <input type="text" name="alt" id="alt" value="{{alt}}" />  
   {{things}}
 </form>
-{{buttons}}
+<div class="button" onclick="addThing();">+ Add a new {{thingCaption}}</div>
+<div class="dialogbuttons">
+  {{buttons}}
+</div>
