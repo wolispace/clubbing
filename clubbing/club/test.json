@@ -87,5 +87,8 @@
                 }
             ]
         }
-    }
+    },
+    "test": "",
+    "action": "save",
+    "page": "test"
 }

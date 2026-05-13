@@ -22,6 +22,23 @@ async function editSection(section) {
   showDialog(json.html);
 }
 
+async function editPage(page) {
+  const buttons = [
+    {caption: "Delete", 
+      onclick: "deleteForm()",
+    },
+    {caption: "Save", 
+      onclick: "saveForm()",
+    },
+    {caption: "Cancel", 
+      onclick: "closeDialog()",
+    }
+  ];
+  const params = {action: 'load', page: page, buttons: buttons}
+  const json = await getJson(params);
+  showDialog(json.html);
+}
+
 // The show starts here
 document.addEventListener('DOMContentLoaded', async () => {
  // sett things up

@@ -115,6 +115,9 @@ function buildTemplatePath($name) {
 
 function renderTemplate($html, $params) {
   foreach ($params as $key => $value) {
+    if (is_array($value)) {
+      logIt($key);
+    }
     $html = str_replace("{{{$key}}}", $value, $html);
   }
   return $html;
@@ -169,21 +172,31 @@ function loadDataForEditing($params) {
   if (empty($data)) {
     return ['error' => 'Club not found'];
   }
-  $section = $data['sections'][$params['section']];
-  if (empty($section)) {
-    // default section details like next date
-    $section = ['date' => '02 May 2026'];
-  } 
-  
-  $section = array_merge($section, $data, $params);
-  $section['date'] = fromYmd($section['section']);
-  $section['hosts'] = buildOptions($data['members'], $section['host']); 
-  $section['locations'] = buildOptions($data['locations'], $section['location']); 
-  $section['buttons'] = buildSubHtml($params['buttons'], 'dialog_button');
-  $section['things'] = buildSubHtml($section['things'], 'edit_thing');
-  $section['template'] = 'edit_section';
-  $section = stripKeys($section, 'dateformat,members,sections');
-  return ['html'=> buildHtml($section)];
+  $html = '';
+  if (empty($params['section'])) {
+    $data['template'] = 'edit_page';
+    $data['page'] = $params['page'];
+    $data['buttons'] = buildSubHtml($params['buttons'], 'dialog_button');
+    $data = stripKeys($data, 'dateformat,members,sections,locations');
+    $html = buildHtml($data);
+  } else {
+    $section = $data['sections'][$params['section']];
+    if (empty($section)) {
+      // default section details like next date
+      $section = ['date' => '02 May 2026'];
+    } 
+    
+    $section = array_merge($section, $data, $params);
+    $section['date'] = fromYmd($section['section']);
+    $section['hosts'] = buildOptions($data['members'], $section['host']); 
+    $section['locations'] = buildOptions($data['locations'], $section['location']); 
+    $section['buttons'] = buildSubHtml($params['buttons'], 'dialog_button');
+    $section['things'] = buildSubHtml($section['things'], 'edit_thing');
+    $section['template'] = 'edit_section';
+    $section = stripKeys($section, 'dateformat,members,sections');
+    $html = buildHtml($section);
+  }
+  return ['html'=> $html];
 }
 
 function buildOptions($list, $current) {
@@ -214,16 +227,20 @@ function saveDataFromEditing($params) {
     return ['error' => 'Club not found'];
   }
   $oldSectionId = $params['section'];
-  $newSectionId = toYmd($params['date']);
-
-  $section = $data['sections']['section'][$oldSectionId] ?? [];
-  // remove old section if the date (which is the key) has changed
-  if (!empty($section) && $oldSectionId != $newSectionId) {
-    unset($data[$oldSectionId]);
+  if (empty($oldSectionId)) {
+    // saving the page not section of it
+    $data = array_merge($data, $params);
+  } else {
+    $newSectionId = toYmd($params['date']);
+    $section = $data['sections']['section'][$oldSectionId] ?? [];
+    // remove old section if the date (which is the key) has changed
+    if (!empty($section) && $oldSectionId != $newSectionId) {
+      unset($data[$oldSectionId]);
+    }
+    $params = stripKeys($params,'test,action,page,section');
+    $data['sections'][$newSectionId] = $params;
   }
 
-  $params = stripKeys($params,'test,action,page,section');
-  $data['sections'][$newSectionId] = $params;
   saveJson($data, $file);
   return ["status" => "ok"];
 }
