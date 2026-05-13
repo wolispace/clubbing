@@ -3,16 +3,17 @@
 $app = loadJson('_data.json');
 $app["webRoot"] = str_replace('index.php', '', $_SERVER['SCRIPT_NAME']);
 
-if (isset($_GET['j'])) {
-  $data = json_decode($_REQUEST['j'], true);
-  outputJson(handleData($data));
-  exit;
-} else {
-  // regular page load, e.g. /?about-us
-  $urlKeys = array_keys($_GET);
-  $params = pageParams(["page" => $urlKeys[0] ?? '']);
-  print buildHtml($params);
+$j = $_REQUEST['j'] ?? null;
+if ($j !== null || $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $data = $j ? json_decode($j, true) : $_REQUEST;
+    outputJson(handleData($data));
+    exit;
 }
+// regular page load, e.g. /?about-us
+$urlKeys = array_keys($_GET);
+$params = pageParams(["page" => $urlKeys[0] ?? '']);
+print buildHtml($params);
+
 
 // --------------------------------------------------- 
 
@@ -61,15 +62,16 @@ function formatSections($data) {
     $section['template'] = 'section';
     $section = buildDateBits($sectionId, $section);
     $section['things'] = buildSubHtml($section['things'], 'thing');
-    $section['showlocation'] = buildLocation($data['locations'], $section);
+    $section['host'] = getSelected($data['members'], $section['host']);
+    $section['location'] = getSelected($data['locations'], $section['location']);
     $html .= buildHtml($section);
   }
   $html .= '</div>';
   return $html;
 }
 
-function buildLocation($locations, $section) {
-  return $locations[$section['location']];
+function getSelected($list, $selected) {
+  return $list[$selected];
 }
 
 function buildDateBits($ymd, $section) {
@@ -169,8 +171,7 @@ function loadDataForEditing($params) {
     $section = ['date' => '02 May 2026'];
   } 
   
-  $section = array_merge($section, $data);
-  $section['section'] = $params['section'];
+  $section = array_merge($section, $data, $params);
   $section['date'] = fromYmd($section['section']);
   $section['hosts'] = buildOptions($data['members'], $section['host']); 
   $section['locations'] = buildOptions($data['locations'], $section['location']); 
@@ -180,11 +181,13 @@ function loadDataForEditing($params) {
   return ['html'=> buildHtml($section)];
 }
 
-function buildOptions($list, $selected) {
-  $html = '';
+function buildOptions($list, $current) {
+  $html = '<option></option>';
+  $counter = 0;
   foreach( $list as $item) {
-    $selected = $item == $selectedd ? 'selected' : '';
-    $html .= "<option value='{$item}' {$selected}>{$item}</option>";
+    $selected = $counter === $current ? 'selected' : '';
+    $html .= "<option value=\"{$counter}\" {$selected}>{$item}</option>";
+    $counter++;
   }
   return $html;
 }
@@ -196,6 +199,33 @@ function buildButtons($buttons) {
     $html .= buildHtml($button);
   }
   return $html;
+}
+
+function saveDataFromEditing($params) {
+  global $app;
+  $file = "{$app['clubFolder']}{$params['page']}.json";
+  $data = loadJson($file);
+  if (empty($data)) {
+    return ['error' => 'Club not found'];
+  }
+  $oldSectionId = $params['section'];
+  $newSectionId = toYmd($params['date']);
+
+  $section = $data['sections']['section'][$oldSectionId] ?? [];
+  // remove old section if the date (which is the key) has changed
+  if (!empty($section) && $oldSectionId != $newSectionId) {
+    unset($data[$oldSectionId]);
+  }
+
+  $params = stripKeys($params,'test,action,page,section');
+  $data['sections'][$newSectionId] = $params;
+  saveJson($data, $file);
+  return ["status" => "ok"];
+}
+
+// remove keys we dont want to save
+function stripKeys($data, $keys) {
+  return array_diff_key($data, array_flip(explode(',', $keys)));
 }
 
 function deleteSomething() {
@@ -210,6 +240,7 @@ function toYmd($str) {
     if ($date) return $date->format('Ymd');
   }
 }
+
 function fromYmd($ymd) {
   $date = DateTime::createFromFormat('Ymd', $ymd);
   return $date->format('d M Y');
@@ -231,10 +262,9 @@ function outputJson($data) {
 }
 
 function loadJson($file) {
-  logIt("loading {$file}");
-    return json_decode(file_get_contents($file), true);
+  return json_decode(file_get_contents($file), true);
 }
 
 function saveJson($data, $file) {
-    file_put_contents($file, json_encode($data, JSON_PRETTY_PRINT));
+  file_put_contents($file, json_encode($data, JSON_PRETTY_PRINT));
 }

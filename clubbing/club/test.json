@@ -10,7 +10,16 @@
     "code": "food",
     "sectionCaption": "event",
     "thingCaption": "book",
-    "members": ["Clare","Jennifer","Jane","Kay","Lesley","Nat","Steph","Vaia"],
+    "members": [
+        "Clare",
+        "Jennifer",
+        "Jane",
+        "Kay",
+        "Lesley",
+        "Nat",
+        "Steph",
+        "Vaia"
+    ],
     "locations": [
         "Clare's 28 Essex St N, Goodwood",
         "Jane's 8 Vernon Crs, Maslin Bch Sth",
@@ -22,7 +31,8 @@
     ],
     "sections": {
         "20260101": {
-            "host": "Steph",
+            "date": "01 Jan 2026",
+            "host": "6",
             "location": "3",
             "alt": "",
             "things": [
@@ -34,8 +44,9 @@
             ]
         },
         "20260203": {
-            "host": "Kay",
-            "location": "3",
+            "date": "03 Feb 2026",
+            "host": "0",
+            "location": "5",
             "alt": "",
             "things": [
                 {
@@ -46,7 +57,8 @@
             ]
         },
         "20260520": {
-            "host": "Jennifer",
+            "date": "20 May 2026",
+            "host": "1",
             "location": "2",
             "alt": "",
             "things": [
@@ -63,20 +75,22 @@
             ]
         },
         "20260617": {
-            "host": "Clare",
-            "location": "0",
+            "date": "17 Jun 2026",
+            "host": "4",
+            "location": "",
             "alt": "",
             "things": [
                 {
-                    "title": "Placeholder",
-                    "by": "",
+                    "title": "Placeholder 1",
+                    "by": "me",
                     "url": ""
                 }
             ]
         },
         "20260715": {
-            "host": "Lesley",
-            "location": "5",
+            "date": "15 Jul 2026",
+            "host": "",
+            "location": "",
             "alt": "",
             "things": [
                 {

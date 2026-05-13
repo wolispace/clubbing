@@ -8,10 +8,10 @@ function extractClubIdFromUrl() {
 async function editSection(section) {
   const buttons = [
     {caption: "Delete", 
-      onclick: "deleteSection()",
+      onclick: "saveForm()",
     },
     {caption: "Save", 
-      onclick: "saveSection()",
+      onclick: "saveForm()",
     },
     {caption: "Cancel", 
       onclick: "closeDialog()",
@@ -34,7 +34,6 @@ async function getJson(params) {
 }
 
 function showDialog(html) {
-  console.log(html);
   window.scrollTo({ top: 0, behavior: 'smooth' });
   document.querySelector('.overlay').classList.add('visible');
   const dialog = document.querySelector('.dialog');
@@ -50,3 +49,10 @@ function closeDialog() {
   document.querySelector('.dialog').classList.remove('visible');
 }
 
+async function saveForm() {
+  const form = document.querySelector('form');
+  const formData = new FormData(form);
+  const response = await fetch('', { method: 'POST', body: formData });
+  const result = await response.json();
+  window.location.reload();
+}
