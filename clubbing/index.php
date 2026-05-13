@@ -64,6 +64,7 @@ function formatSections($data) {
     $section['things'] = buildSubHtml($section['things'], 'thing');
     $section['host'] = getSelected($data['members'], $section['host']);
     $section['location'] = getSelected($data['locations'], $section['location']);
+    $section = stripKeys($section, 'dateformat,members');
     $html .= buildHtml($section);
   }
   $html .= '</div>';
@@ -71,6 +72,9 @@ function formatSections($data) {
 }
 
 function getSelected($list, $selected) {
+  if ($selected === '') {
+    return '';
+  }
   return $list[$selected];
 }
 
@@ -178,6 +182,7 @@ function loadDataForEditing($params) {
   $section['buttons'] = buildSubHtml($params['buttons'], 'dialog_button');
   $section['things'] = buildSubHtml($section['things'], 'edit_thing');
   $section['template'] = 'edit_section';
+  $section = stripKeys($section, 'dateformat,members,sections');
   return ['html'=> buildHtml($section)];
 }
 
@@ -228,8 +233,17 @@ function stripKeys($data, $keys) {
   return array_diff_key($data, array_flip(explode(',', $keys)));
 }
 
-function deleteSomething() {
-  //
+function deleteSomething($params) {
+  global $app;
+  $file = "{$app['clubFolder']}{$params['page']}.json";
+  $data = loadJson($file);
+  if (empty($data)) {
+    return ['error' => 'Club not found'];
+  }
+  unset($data['sections'][$params['section']]);
+  saveJson($data, $file);
+  logIt("deleted {$params['page']} {$params['section']}");
+  return ["status" => "ok"];
 }
 
 // utilities ----------------------------------
@@ -266,5 +280,6 @@ function loadJson($file) {
 }
 
 function saveJson($data, $file) {
+  logIt('save ' . $file . ' ' . json_encode($data));
   file_put_contents($file, json_encode($data, JSON_PRETTY_PRINT));
 }

@@ -8,7 +8,7 @@ function extractClubIdFromUrl() {
 async function editSection(section) {
   const buttons = [
     {caption: "Delete", 
-      onclick: "saveForm()",
+      onclick: "deleteForm()",
     },
     {caption: "Save", 
       onclick: "saveForm()",
@@ -54,5 +54,15 @@ async function saveForm() {
   const formData = new FormData(form);
   const response = await fetch('', { method: 'POST', body: formData });
   const result = await response.json();
+  window.location.reload();
+}
+
+async function deleteForm() {
+  if (!confirm('Are you sure you want to delete this?')) {
+    return;
+  }
+  const section = document.querySelector('#section').value;
+  const params = {action: 'delete', page: clubId, section: section};
+  const json = await getJson(params);
   window.location.reload();
 }
