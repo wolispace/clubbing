@@ -17,7 +17,7 @@ async function editSection(section) {
       onclick: "closeDialog()",
     }
   ];
-  const params = {action: 'load', page: clubId, section: section, buttons: buttons}
+  const params = {action: 'load', type: 'section', page: clubId, section: section, buttons: buttons}
   const json = await getJson(params);
   showDialog(json.html);
 }
@@ -34,9 +34,17 @@ async function editPage(page) {
       onclick: "closeDialog()",
     }
   ];
-  const params = {action: 'load', page: page, buttons: buttons}
+  const params = {action: 'load', type: 'page', page: page, buttons: buttons}
   const json = await getJson(params);
   showDialog(json.html);
+}
+
+async function addThing() {
+  const params = {action: 'load', type: 'thing'}
+  const json = await getJson(params);
+  const form = document.querySelector('form');
+  form.innerHTML = form.innerHTML + json.html;
+  console.log(json.html);
 }
 
 // The show starts here

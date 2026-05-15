@@ -173,37 +173,56 @@ function loadDataForEditing($params) {
     return ['error' => 'Club not found'];
   }
   $html = '';
-  if (empty($params['section'])) {
-    $data['template'] = 'edit_page';
-    $data['page'] = $params['page'];
-    $data['buttons'] = buildSubHtml($params['buttons'], 'dialog_button');
-    $data = stripKeys($data, 'dateformat,members,sections,locations');
-    $html = buildHtml($data);
-  } else {
-    $section = $data['sections'][$params['section']];
-    if (empty($section)) {
-      // default section details like next date
-      $section = ['date' => '02 May 2026'];
-    } 
-    
-    $section = array_merge($section, $data, $params);
-    $section['date'] = fromYmd($section['section']);
-    $section['hosts'] = buildOptions($data['members'], $section['host']); 
-    $section['locations'] = buildOptions($data['locations'], $section['location']); 
-    $section['buttons'] = buildSubHtml($params['buttons'], 'dialog_button');
-    $section['things'] = buildSubHtml($section['things'], 'edit_thing');
-    $section['template'] = 'edit_section';
-    $section = stripKeys($section, 'dateformat,members,sections');
-    $html = buildHtml($section);
-  }
+  switch ($params['type']) {
+    case 'page': 
+      $data['template'] = 'edit_page';
+      $data['page'] = $params['page'];
+      $data['buttons'] = buildSubHtml($params['buttons'], 'dialog_button');
+      $data = stripKeys($data, 'dateformat,members,sections,locations');
+      $html = buildHtml($data);
+      break;
+    case 'section': 
+      $section = $data['sections'][$params['section']];
+      if (empty($section)) {
+        // default section details like next date
+        $section = ['date' => '02 May 2026'];
+      }       
+      $section = formatSection($section, $data, $params);
+      $html = buildHtml($section);
+      break;
+    case 'thing': 
+      $data['template'] = 'edit_thing';
+      $data = stripKeys($data, 'dateformat,members,sections,locations');
+      $html = buildHtml($data);
+      break;
+    default: // nothing to get
+      $html = 'Nothing to do';
+  };
+
   return ['html'=> $html];
+}
+
+function formatSection($section, $data, $params) {
+  $section = array_merge($section, $params);
+  $section['thingCaption'] = $data['thingCaption'];
+  $section['date'] = fromYmd($params['section']);
+  $section['hosts'] = buildOptions($data['members'], $section['host']); 
+  $section['locations'] = buildOptions($data['locations'], $section['location']); 
+  $section['buttons'] = buildSubHtml($params['buttons'], 'dialog_button');
+  $section['things'] = buildSubHtml($section['things'], 'edit_thing');
+  $section['template'] = 'edit_section';
+  $section = stripKeys($section, 'dateformat,members,sections');
+  return $section;
 }
 
 function buildOptions($list, $current) {
   $html = '<option></option>';
   $counter = 0;
   foreach( $list as $item) {
-    $selected = $counter === $current ? 'selected' : '';
+    if($counter == $current) {
+      logIt("{$item} {$counter} {$current}");
+    }
+    $selected = $counter == $current ? 'selected' : '';
     $html .= "<option value=\"{$counter}\" {$selected}>{$item}</option>";
     $counter++;
   }
