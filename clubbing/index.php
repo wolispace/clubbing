@@ -158,10 +158,11 @@ function getClubs() {
 }
 
 function formatClubList($clubs) {
-  $clubList = '';
+  $clubList = '<ul>';
   foreach($clubs as $clubId => $clubData) {
-    $clubList .= "<a href='?$clubId'>{$clubData['name']}</a>";
+    $clubList .= "<li><a href='?$clubId'>{$clubData['name']}</a></li>";
   }
+  $clubList .= '</ul>';
   return $clubList;
 }
 
@@ -203,8 +204,8 @@ function loadDataForEditing($params) {
 }
 
 function formatPage($data, $params) {
-  $data['members'] =implode("\n", $data['members']);
-  $data['locations'] =implode("\n", $data['locations']);
+  $data['members'] = implode("\n", $data['members']);
+  $data['locations'] = implode("\n", $data['locations']);
   return $data;
 }
 
@@ -251,13 +252,13 @@ function saveDataFromEditing($params) {
   if (empty($data)) {
     return ['error' => 'Club not found'];
   }
-  $oldSectionId = $params['section'];
-  if (empty($oldSectionId)) {
-    // saving the page not section of it
+  switch ($params['type']) {
+  case 'page':
     $data = array_merge($data, $params);
-    $data['members'] = explode("\n", $data['members']);
-    $data['locations'] = explode("\n", $data['locations']);
-  } else {
+    $data['members'] = encodeList($data['members']);
+    $data['locations'] = encodeList($data['locations']);
+    break;
+  case 'section':
     $newSectionId = toYmd($params['date']);
     $section = $data['sections']['section'][$oldSectionId] ?? [];
     // remove old section if the date (which is the key) has changed
@@ -267,10 +268,17 @@ function saveDataFromEditing($params) {
     $params['things'] = removeBlankThings($params['things']);
     $params = stripKeys($params,'test,action,page,section');
     $data['sections'][$newSectionId] = $params;
-  }
+    break;
+  default:
+    return ["status" => "nothing to save"];;
+  };
 
   saveJson($data, $file);
   return ["status" => "ok"];
+}
+
+function encodeList($list) {
+ return explode("\n", str_replace("\r", "", $list));
 }
 
 function removeBlankThings($things) {
