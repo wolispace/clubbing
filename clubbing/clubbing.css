@@ -173,6 +173,10 @@ form {
   padding: 1rem 0;
 }
 
-input, select {
+input, select textarea {
   font-size: 110%;
+}
+
+textarea {
+  height: 7rem;
 }

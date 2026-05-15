@@ -178,7 +178,7 @@ function loadDataForEditing($params) {
       $data['template'] = 'edit_page';
       $data['page'] = $params['page'];
       $data['buttons'] = buildSubHtml($params['buttons'], 'dialog_button');
-      $data = stripKeys($data, 'dateformat,members,sections,locations');
+      $data = formatPage($data, $params);
       $html = buildHtml($data);
       break;
     case 'section': 
@@ -200,6 +200,12 @@ function loadDataForEditing($params) {
   };
 
   return ['html'=> $html];
+}
+
+function formatPage($data, $params) {
+  $data['members'] =implode("\n", $data['members']);
+  $data['locations'] =implode("\n", $data['locations']);
+  return $data;
 }
 
 function formatSection($section, $data, $params) {
@@ -249,6 +255,8 @@ function saveDataFromEditing($params) {
   if (empty($oldSectionId)) {
     // saving the page not section of it
     $data = array_merge($data, $params);
+    $data['members'] = explode("\n", $data['members']);
+    $data['locations'] = explode("\n", $data['locations']);
   } else {
     $newSectionId = toYmd($params['date']);
     $section = $data['sections']['section'][$oldSectionId] ?? [];
