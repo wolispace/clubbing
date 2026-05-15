@@ -38,7 +38,7 @@
             "things": [
                 {
                     "title": "Little book of green",
-                    "by": "",
+                    "by": "bob",
                     "url": ""
                 }
             ]
@@ -50,8 +50,8 @@
             "alt": "",
             "things": [
                 {
-                    "title": "Book of the white",
-                    "by": "",
+                    "title": "Place holder",
+                    "by": "noone",
                     "url": ""
                 }
             ]
@@ -77,12 +77,21 @@
         "20260617": {
             "date": "17 Jun 2026",
             "host": "4",
-            "location": "",
+            "location": "0",
             "alt": "",
             "things": [
                 {
                     "title": "Placeholder 1",
                     "by": "me",
+                    "url": ""
+                },
+                {
+                    "title": "Book two"
+                },
+                {
+                    "by": ""
+                },
+                {
                     "url": ""
                 }
             ]

@@ -22,7 +22,7 @@ async function editSection(section) {
   showDialog(json.html);
 }
 
-async function editPage(page) {
+async function editPage(x) {
   const buttons = [
     {caption: "Delete", 
       onclick: "deleteForm()",
@@ -34,13 +34,13 @@ async function editPage(page) {
       onclick: "closeDialog()",
     }
   ];
-  const params = {action: 'load', type: 'page', page: page, buttons: buttons}
+  const params = {action: 'load', type: 'page', page: clubId, buttons: buttons}
   const json = await getJson(params);
   showDialog(json.html);
 }
 
-async function addThing() {
-  const params = {action: 'load', type: 'thing'}
+async function addThing(page) {
+  const params = {action: 'load', type: 'thing', page: clubId};
   const json = await getJson(params);
   const form = document.querySelector('form');
   form.innerHTML = form.innerHTML + json.html;

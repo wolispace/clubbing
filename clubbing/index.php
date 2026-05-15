@@ -256,12 +256,23 @@ function saveDataFromEditing($params) {
     if (!empty($section) && $oldSectionId != $newSectionId) {
       unset($data[$oldSectionId]);
     }
+    $params['things'] = removeBlankThings($params['things']);
     $params = stripKeys($params,'test,action,page,section');
     $data['sections'][$newSectionId] = $params;
   }
 
   saveJson($data, $file);
   return ["status" => "ok"];
+}
+
+function removeBlankThings($things) {
+  $newThings = [];
+  foreach ($things as $thing) {
+    if (!empty($thing['title'])) {
+      $newThings[] = $thing;
+    }
+  }
+return $newThings;
 }
 
 // remove keys we dont want to save
