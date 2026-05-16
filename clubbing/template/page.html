@@ -16,10 +16,11 @@
     <div class="container">
         <header>
             <h1>{{name}}</h1>
-            <div class="edit" onclick="editPage('{{page}}')"><i class="fas fa-pencil"></i></div>
+            <div class="edit" onclick="editPage()"><i class="fas fa-pencil"></i></div>
         </header>
         <main>
             {{content}}
+            <div class="button" onclick="editSection()">Add a new {{sectionCaption}}</div>
         </main>
     </div>
     <footer>{{footer}}</footer>

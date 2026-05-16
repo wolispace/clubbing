@@ -48,6 +48,8 @@ function getContent($params) {
     $params['content'] = '';   
   } else {
     $params['name'] = $data['name'];
+    $params['sectionCaption'] = $data['sectionCaption'];
+    $params['thingCaption'] = $data['thingCaption'];    
     $params['content'] = formatSections($data);
   }
   return $params;
@@ -186,13 +188,16 @@ function loadDataForEditing($params) {
       $section = $data['sections'][$params['section']];
       if (empty($section)) {
         // default section details like next date
-        $section = ['date' => '02 May 2026'];
-      }       
+        $params['section'] = date('Ymd');
+      }
+      $section['section'] = $params['section'];       
       $section = formatSection($section, $data, $params);
       $html = buildHtml($section);
       break;
     case 'thing': 
       $data['template'] = 'edit_thing';
+      $section = $data['sections'][$params['section']];
+      $data['id'] = $params['id'];
       $data = stripKeys($data, 'dateformat,members,sections,locations');
       $html = buildHtml($data);
       break;
@@ -249,6 +254,7 @@ function saveDataFromEditing($params) {
   global $app;
   $file = "{$app['clubFolder']}{$params['page']}.json";
   $data = loadJson($file);
+  logIt("Saving " . json_encode($params));
   if (empty($data)) {
     return ['error' => 'Club not found'];
   }

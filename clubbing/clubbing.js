@@ -22,7 +22,7 @@ async function editSection(section) {
   showDialog(json.html);
 }
 
-async function editPage(x) {
+async function editPage() {
   const buttons = [
     {caption: "Delete", 
       onclick: "deleteForm()",
@@ -39,8 +39,9 @@ async function editPage(x) {
   showDialog(json.html);
 }
 
-async function addThing(page) {
-  const params = {action: 'load', type: 'thing', page: clubId};
+async function addThing(section) {
+  const thingCount = document.querySelectorAll('.thing').length;
+  const params = {action: 'load', type: 'thing', page: clubId, section: section, id: thingCount};
   const json = await getJson(params);
   const form = document.querySelector('form');
   form.innerHTML = form.innerHTML + json.html;

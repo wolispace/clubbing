@@ -1,5 +1,5 @@
 :root {
-    --font-color: rgba(200, 192, 229, 0.5);
+    --font-color: rgba(200, 192, 229, 0.85);
     --font-color-bold: rgba(200, 192, 229, 1);
     --bg-color: #1a1621;
 }
@@ -27,14 +27,14 @@ a:hover {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 1rem;    
+    gap: 1rem;
+    padding-bottom:2rem;
 }
 
 .section {
     background-color: rgba(0,0,0,0.25);
     border-radius: 1rem;
     display: flex;
-    gap: 0.5rem;
     position: relative;
 }
 
@@ -65,10 +65,12 @@ a:hover {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    width: 100%;
 }
 
 .book {
     padding-right: 2rem;
+    padding-left: 0.5rem;
 }
 
 .title {
@@ -88,6 +90,14 @@ a:hover {
     top: 0.5rem;
     right: 0.5rem;
     cursor: pointer;
+}
+
+.location {
+  background-color: rgba(0,0,0,0.8);
+  border-bottom-right-radius: 1rem;
+  margin-top: 0.5rem;
+  padding-top:.5rem;
+  padding-left: 0.5rem;
 }
 
 .fas {
@@ -173,10 +183,22 @@ form {
   padding: 1rem 0;
 }
 
-input, select textarea {
-  font-size: 110%;
+label {
+  padding: .5rem 0 .1rem 0;
+}
+
+input, select {
+  font-size: 100%;
 }
 
 textarea {
+   font-size: 85%;
   height: 7rem;
+  font-family: inherit;
+}
+
+footer {
+  margin-top: .5rem;
+  padding: .5rem 0;
+  background-color: rgba(0,0,0,.3);
 }
