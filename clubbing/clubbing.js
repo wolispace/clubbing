@@ -44,8 +44,7 @@ async function addThing(section) {
   const params = {action: 'load', type: 'thing', page: clubId, section: section, id: thingCount};
   const json = await getJson(params);
   const form = document.querySelector('form');
-  form.innerHTML = form.innerHTML + json.html;
-  console.log(json.html);
+  form.insertAdjacentHTML('beforeend', json.html);
 }
 
 // The show starts here
