@@ -32,7 +32,7 @@ function pageParams($params) {
     default: // page defined so get its content
       $params['template'] = $params['template'] ?? 'page';
       $params = getContent($params); 
-      $params['footer'] = "<a href='{$app['webRoot']}'>Home</a>";
+      $params['footer'] = "<a href='{$app['webRoot']}'>&lt; Change club</a>";
   };
 
   $params['version'] = rand(10, 99999);
@@ -63,6 +63,7 @@ function formatSections($data) {
     $section['sectionId'] = $sectionId;
     $section['template'] = 'section';
     $section = buildDateBits($sectionId, $section);
+    $section['things'] = buildUrls($section['things']);
     $section['things'] = buildSubHtml($section['things'], 'thing');
     $section['host'] = getSelected($data['members'], $section['host']);
     $section['location'] = getSelected($data['locations'], $section['location']);
@@ -89,13 +90,28 @@ function buildDateBits($ymd, $section) {
   return $section;
 }
 
+
+function buildUrls($things) {
+  global $app;
+  foreach($things as $key => &$thing) {
+    if (empty($thing['url'])) {
+      continue;
+    }
+    $thing['template'] = 'url';
+    $thing['url'] = buildHtml($thing);
+  }
+  return $things;
+}
+
 function buildSubHtml($list, $template) {
   global $app;
   $html = '';
   $counter = 0;
-  foreach($list as $thing) {
+  foreach($list as $key => $thing) {
     $thing['template'] = $template;
+    $thing['key'] = $key;
     $thing['id'] = $counter++;
+    
     $html .= buildHtml($thing);
   }
   return $html;
@@ -160,10 +176,8 @@ function getClubs() {
 }
 
 function formatClubList($clubs) {
-  $clubList = '<ul>';
-  foreach($clubs as $clubId => $clubData) {
-    $clubList .= "<li><a href='?$clubId'>{$clubData['name']}</a></li>";
-  }
+  $clubList = 'Club list: <ul>';
+  $clubList .= buildSubHtml($clubs, 'club_list');
   $clubList .= '</ul>';
   return $clubList;
 }
