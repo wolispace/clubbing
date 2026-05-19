@@ -134,9 +134,6 @@ function buildTemplatePath($name) {
 
 function renderTemplate($html, $params) {
   foreach ($params as $key => $value) {
-    if (is_array($value)) {
-      logIt($key);
-    }
     $html = str_replace("{{{$key}}}", $value, $html);
   }
   return $html;
@@ -246,9 +243,6 @@ function buildOptions($list, $current) {
   $html = '<option></option>';
   $counter = 0;
   foreach( $list as $item) {
-    if("{$counter}" === $current) {
-      logIt("{$item} {$counter} {$current}");
-    }
     $selected = "{$counter}" === $current ? 'selected' : '';
     $html .= "<option value=\"{$counter}\" {$selected}>{$item}</option>";
     $counter++;
@@ -278,6 +272,7 @@ function saveDataFromEditing($params) {
     $data = array_merge($data, $params);
     $data['members'] = encodeList($data['members']);
     $data['locations'] = encodeList($data['locations']);
+    $data = stripKeys($data,"{$params['page']},test,action,type,page");
     break;
   case 'section':
     $newSectionId = toYmd($params['date']);
@@ -287,7 +282,7 @@ function saveDataFromEditing($params) {
       unset($data[$oldSectionId]);
     }
     $params['things'] = removeBlankThings($params['things']);
-    $params = stripKeys($params,'test,action,page,section');
+    $params = stripKeys($params,"{$params['page']},test,action,type,page,section");
     $data['sections'][$newSectionId] = $params;
     break;
   default:
