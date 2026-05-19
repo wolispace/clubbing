@@ -67,6 +67,7 @@ function formatSections($data) {
     $section['things'] = buildSubHtml($section['things'], 'thing');
     $section['host'] = getSelected($data['members'], $section['host']);
     $section['location'] = getSelected($data['locations'], $section['location']);
+    $section['location'] = !empty($section['alt']) ? $section['alt'] : $section['location'];
     $section = stripKeys($section, 'dateformat,members');
     $html .= buildHtml($section);
   }
@@ -245,10 +246,10 @@ function buildOptions($list, $current) {
   $html = '<option></option>';
   $counter = 0;
   foreach( $list as $item) {
-    if($counter == $current) {
+    if("{$counter}" === $current) {
       logIt("{$item} {$counter} {$current}");
     }
-    $selected = $counter == $current ? 'selected' : '';
+    $selected = "{$counter}" === $current ? 'selected' : '';
     $html .= "<option value=\"{$counter}\" {$selected}>{$item}</option>";
     $counter++;
   }
