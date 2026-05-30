@@ -1,3 +1,3 @@
-start "" http://localhost:8808/clubbing/
-
-start "" "W:\My Drive\Apps\php7\php.exe" -S localhost:8808
+set PORT=8807
+start "" http://localhost:%PORT%/clubbing/
+start "" "W:\My Drive\Apps\php7\php.exe" -S localhost:%PORT%
