@@ -53,8 +53,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function getJson(params) {
+    moveOverlay(4);
     const response = await fetch(`?j=${JSON.stringify(params)}`);
     const result = await response.json();
+    moveOverlay(2);
     return result;
 }
 
@@ -74,7 +76,14 @@ function closeDialog() {
   document.querySelector('.dialog').classList.remove('visible');
 }
 
+function moveOverlay(zIndex) {
+  // show overlay with a loading spinner or something
+  const overlay = document.querySelector('.overlay');
+  overlay.style.zIndex = zIndex;
+}
+
 async function saveForm() {
+  moveOverlay(4);
   const form = document.querySelector('form');
   const formData = new FormData(form);
   const response = await fetch('', { method: 'POST', body: formData });
