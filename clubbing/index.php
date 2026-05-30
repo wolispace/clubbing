@@ -26,13 +26,14 @@ function pageParams($params) {
       $params['content'] = formatClubList(getClubs());
       $params['template'] = 'home';
       $params['name'] = $app['name'];
-      $params['footer'] = ''; 
+      $params['footer'] = 'NO'; 
       break;
     // new case for each special page   
     default: // page defined so get its content
       $params['template'] = $params['template'] ?? 'page';
       $params = getContent($params); 
-      $params['footer'] = "<a href='{$app['webRoot']}'>&lt; Change club</a>";
+      $footerParams = ['template'=> 'footer', 'webroot' => $app['webRoot']];
+      $params['footer'] = buildHtml($footerParams);
   };
 
   $params['version'] = rand(10, 99999);

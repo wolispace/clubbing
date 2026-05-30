@@ -1,4 +1,11 @@
+const ZOOM_KEY = 'clubbing_zoom';
 const clubId = extractClubIdFromUrl();
+
+// The show starts here
+document.addEventListener('DOMContentLoaded', async () => {
+  const saved = localStorage.getItem(ZOOM_KEY);
+  if (saved) document.documentElement.style.fontSize = saved + 'px';
+});
 
 function extractClubIdFromUrl() {
   let queryParam = window.location.href;
@@ -47,11 +54,6 @@ async function addThing(section) {
   form.insertAdjacentHTML('beforeend', json.html);
 }
 
-// The show starts here
-document.addEventListener('DOMContentLoaded', async () => {
- // sett things up
-});
-
 async function getJson(params) {
     moveOverlay(4);
     const response = await fetch(`?j=${JSON.stringify(params)}`);
@@ -99,4 +101,15 @@ async function deleteForm() {
   const params = {action: 'delete', page: clubId, section: section};
   const json = await getJson(params);
   window.location.reload();
+}
+
+
+
+function zoom(amount) {
+  const current = parseFloat(getComputedStyle(document.documentElement).fontSize);
+  const newSize = Math.min(Math.max(current + amount, 12), 32);
+  document.documentElement.style.fontSize = newSize + 'px';
+  localStorage.setItem(ZOOM_KEY, newSize);
+  setTimeout(window.scrollTo({ bottom: 0, behavior: 'smooth' }, 500));
+  
 }
