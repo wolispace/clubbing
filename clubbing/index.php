@@ -11,6 +11,7 @@ if ($j !== null || $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 // regular page load, e.g. /?about-us
 $urlKeys = array_keys($_GET);
+
 $params = pageParams(["page" => $urlKeys[0] ?? '']);
 print buildHtml($params);
 
@@ -21,6 +22,8 @@ function pageParams($params) {
   global $app;
   // page is the first param ?about etc.. Default page of blank is the 'home' page 
   $params['page'] = $params['page'] ?? '';
+  // merge url params into our request
+  $params = array_merge($params, $_REQUEST); 
   switch ($params['page']) {
     case '': // no page so get homepage content
       $params['content'] = formatClubList(getClubs());
@@ -44,6 +47,7 @@ function getContent($params) {
   global $app;
   $file = "{$app['clubFolder']}{$params['page']}.json";
   $data = loadJson($file);
+  $data = array_merge($params, $data);
   if (empty($data)) {
     $params['name'] = 'Club not found';
     $params['content'] = '';   
@@ -52,15 +56,27 @@ function getContent($params) {
     $params['sectionCaption'] = $data['sectionCaption'];
     $params['thingCaption'] = $data['thingCaption'];    
     $params['content'] = formatSections($data);
+    $params['pagebuttons'] = pageButtons($data);
   }
   return $params;
 }
 
+// $all: 0 = from today onwards, 1 = start of this year, 2+ = years back
 function formatSections($data) {
   global $app;
   $html = '<div class="sections">';
+  $startDate = date('Ymd');
+  if (!empty($data['all'])) {
+    // go back to the start of this year
+    $startDate = date('Y0101');
+    // go beck in years (if 2+ passed then we go back 1 year etc..)
+    $startDate = $startDate - ( ( (int)$data['all'] - 1) * 10000 );
+  }
   // loop through the events and build them from html templates
   foreach($data['sections'] as $sectionId => $section) {
+    if ($sectionId <= $startDate) {
+      continue;
+    }
     $section['sectionId'] = $sectionId;
     $section['template'] = 'section';
     $section = buildDateBits($sectionId, $section);
@@ -72,7 +88,25 @@ function formatSections($data) {
     $section = stripKeys($section, 'dateformat,members');
     $html .= buildHtml($section);
   }
+
   $html .= '</div>';
+  return $html;
+}
+
+function pageButtons($data) {
+  $html = '';
+  $params = [
+    'template' => 'page_button', 
+    'onclick' => 'editSection()', 
+    'caption'=> "Add a new {$data['sectionCaption']}"
+    ];
+  $html .= buildHtml($params);
+  $params = [
+    'template' => 'page_button', 
+    'onclick' => 'showAll()', 
+    'caption'=> "Show hold year"
+    ];
+  $html .= buildHtml($params);
   return $html;
 }
 
