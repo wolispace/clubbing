@@ -203,7 +203,7 @@ function loadDataForEditing($params) {
       if (!empty($params['section']) && !empty($data['sections'][$params['section']])) {
         $section = $data['sections'][$params['section']];
       } else {
-        $ection = [];
+        $section = [];
         // default section details like next date
         $sectionKeys = array_keys($data['sections']);
         $highestSection = array_pop($sectionKeys);
@@ -236,7 +236,6 @@ function formatPage($data, $params) {
 function formatSection($section, $data, $params) {
   $section = array_merge($section, $params);
   $section['thingCaption'] = $data['thingCaption'];
-  logIt("section = {$params['section']} ");
   $section['date'] = fromYmd($params['section']);
   $section['hosts'] = buildOptions($data['members'], $section['host']); 
   $section['locations'] = buildOptions($data['locations'], $section['location']); 
@@ -379,11 +378,10 @@ function buildRecurring($data) {
   return $data;
 }
 function buildRecurringLists() {
-  $days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   return [
     'nths' => array_merge(['First','Second','Third','Last'], range(1, 31)),
-    'days' => array_merge($days),
-    'everys' => range(0, 12),
+    'days' => ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+    'everys' => array_merge(['every'], range(1, 12)),
     'units' => ['week','month'],
   ];
 }
@@ -400,13 +398,10 @@ function nextDate($ymd, $params) {
   $every = ($every < 1) ? 1 : $every; // minimum always 1 = every week or every month 
   $unit = $params['unit']; // 'week' or 'month'
 
-  logIt("{$nth} {$targetDay} {$every} {$unit}");
-  // nth=3 p2=3 every=0 $unit=1
-
   $date = clone $lastDate;
 
   if ($nth > 3) {
-    // Fixed day-of-month (e.g. 15 _ every 1 month)
+    // Fixed day-of-month (e.g. 15 | _ | every 1 | month)
     $day = (int)$nth - 3;
     $date->modify("+{$every} {$unit}s");
     $date->setDate((int)$date->format('Y'), (int)$date->format('n'), $day);
@@ -416,7 +411,8 @@ function nextDate($ymd, $params) {
   $weekday = $days[$targetDay];
   $ordinal = isset($ordinals[$nth]) ? $ordinals[$nth] : (int)$nth;
 
-  if ($unit == 0) { // weeks
+  // Weekly: day 
+  if ($unit == 0) { 
     // e.g. _ | sat | every 2 | week
     $date->modify("+{$every} weeks");
     return $date->format('Ymd');
@@ -433,11 +429,11 @@ function nextDate($ymd, $params) {
     $counter = 0;
     while ($candidate->format('w') != $targetDay) {
       $candidate->modify('+1 day');
-      logIt("A {$candidate->format('w D d M Y')} ? {$targetDay}");
+      // logIt("A {$candidate->format('w D d M Y')} ? {$targetDay}");
     }
     $candidate->modify('+' . ($nth) . ' weeks');
   }
-  logIt("a1 {$candidate->format('w D d M Y')} <= {$lastDate->format('w D d M Y')}");
+  // logIt("a1 {$candidate->format('w D d M Y')} <= {$lastDate->format('w D d M Y')}");
   // If that date hasn't passed yet, use it — otherwise advance by $every months
   if ($candidate <= $lastDate) {
     $date->modify("+{$every} months");
@@ -449,10 +445,10 @@ function nextDate($ymd, $params) {
       $candidate = new DateTime("first day of {$year}-{$month}");
       while ($candidate->format('w') != $targetDay) {
         $candidate->modify('+1 day');
-        logIt("B {$candidate->format('w D d M Y')} ? {$targetDay}");
+        // logIt("B {$candidate->format('w D d M Y')} ? {$targetDay}");
       }
       $candidate->modify('+' . ($nth) . ' weeks');
-      logIt("C {$candidate->format('w D d M Y')} + {$nth} weeks ?why?");
+      // logIt("C {$candidate->format('w D d M Y')} + {$nth} weeks ?why?");
 
     }
   }
