@@ -194,14 +194,20 @@ function loadDataForEditing($params) {
       $data['template'] = 'edit_page';
       $data['page'] = $params['page'];
       $data['buttons'] = buildSubHtml($params['buttons'], 'dialog_button');
+      $data = buildRecurring($data);
       $data = formatPage($data, $params);
+      logIt(json_encode($data));
       $html = buildHtml($data);
       break;
-    case 'section': 
-      $section = $data['sections'][$params['section']];
-      if (empty($section)) {
+    case 'section':
+      if (!empty($params['section']) && !empty($data['sections'][$params['section']])) {
+        $section = $data['sections'][$params['section']];
+      } else {
+        $ection = [];
         // default section details like next date
-        $params['section'] = date('Ymd');
+        $sectionKeys = array_keys($data['sections']);
+        $highestSection = array_pop($sectionKeys);
+        $params['section'] = nextDate($highestSection, $data);
       }
       $section['section'] = $params['section'];       
       $section = formatSection($section, $data, $params);
@@ -230,6 +236,7 @@ function formatPage($data, $params) {
 function formatSection($section, $data, $params) {
   $section = array_merge($section, $params);
   $section['thingCaption'] = $data['thingCaption'];
+  logIt("section = {$params['section']} ");
   $section['date'] = fromYmd($params['section']);
   $section['hosts'] = buildOptions($data['members'], $section['host']); 
   $section['locations'] = buildOptions($data['locations'], $section['location']); 
@@ -276,14 +283,13 @@ function saveDataFromEditing($params) {
     $data = stripKeys($data,"{$params['page']},test,action,type,page");
     break;
   case 'section':
+    $oldSectionId = $params['section'];
     $newSectionId = toYmd($params['date']);
-    $section = $data['sections']['section'][$oldSectionId] ?? [];
-    // remove old section if the date (which is the key) has changed
-    if (!empty($section) && $oldSectionId != $newSectionId) {
-      unset($data[$oldSectionId]);
-    }
+    // remove old section
+    unset($data['sections'][$oldSectionId]);
     $params['things'] = removeBlankThings($params['things']);
     $params = stripKeys($params,"{$params['page']},test,action,type,page,section");
+    // add new section
     $data['sections'][$newSectionId] = $params;
     break;
   default:
@@ -305,7 +311,7 @@ function removeBlankThings($things) {
       $newThings[] = $thing;
     }
   }
-return $newThings;
+  return $newThings;
 }
 
 // remove keys we dont want to save
@@ -329,7 +335,7 @@ function deleteSomething($params) {
 // utilities ----------------------------------
 
 function toYmd($str) {
-  foreach (['d M Y', 'd/m/Y'] as $format) {
+  foreach (['d M Y', 'd/m/Y', 'd-m-Y'] as $format) {
     $date = DateTime::createFromFormat($format, $str);
     if ($date) return $date->format('Ymd');
   }
@@ -363,3 +369,94 @@ function saveJson($data, $file) {
   logIt('save ' . $file . ' ' . json_encode($data));
   file_put_contents($file, json_encode($data, JSON_PRETTY_PRINT));
 }
+
+function buildRecurring($data) {
+  $recurList = buildRecurringLists();
+  $data['nths'] = buildOptions($recurList['nths'], $data['nth']);
+  $data['days'] = buildOptions($recurList['days'], $data['day']);
+  $data['everys'] = buildOptions($recurList['everys'], $data['every']);
+  $data['units'] = buildOptions($recurList['units'], $data['unit']);
+  return $data;
+}
+function buildRecurringLists() {
+  $days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  return [
+    'nths' => array_merge(['First','Second','Third','Last'], range(1, 31)),
+    'days' => array_merge($days),
+    'everys' => range(0, 12),
+    'units' => ['week','month'],
+  ];
+}
+
+// $params contains {"part1": "thrid", "part2": "Wednesday", "part3": "1", "part4": "month"}
+function nextDate($ymd, $params) {
+  $lastDate = DateTime::createFromFormat('Ymd', $ymd);
+  $days = ['Sunday','Monday','Tuesday','Wednesday','Thusday','Friday','Saturday'];
+  $recur = buildRecurringLists();
+
+  $nth = $params['nth']; // e.g. 0=1st, 1=2nd, 2=3rd, 3=last, 4=1, 5=2 up to 31
+  $targetDay = $params['day']; // e.g. 0 = Sun, 1 = Mon etc  or blank
+  $every = (int)$params['every']; // 1, 2
+  $every = ($every < 1) ? 1 : $every; // minimum always 1 = every week or every month 
+  $unit = $params['unit']; // 'week' or 'month'
+
+  logIt("{$nth} {$targetDay} {$every} {$unit}");
+  // nth=3 p2=3 every=0 $unit=1
+
+  $date = clone $lastDate;
+
+  if ($nth > 3) {
+    // Fixed day-of-month (e.g. 15 _ every 1 month)
+    $day = (int)$nth - 3;
+    $date->modify("+{$every} {$unit}s");
+    $date->setDate((int)$date->format('Y'), (int)$date->format('n'), $day);
+    return $date->format('Ymd');
+  }
+
+  $weekday = $days[$targetDay];
+  $ordinal = isset($ordinals[$nth]) ? $ordinals[$nth] : (int)$nth;
+
+  if ($unit == 0) { // weeks
+    // e.g. _ | sat | every 2 | week
+    $date->modify("+{$every} weeks");
+    return $date->format('Ymd');
+  }
+
+  // Monthly: nth weekday of month
+  $month = (int)$date->format('n');
+  $year  = (int)$date->format('Y');
+
+  if ($nth === 3) { // last -  last Monday of 
+    $candidate = new DateTime("last {$weekday} of {$date->format('F Y')}");
+  } else {
+    $candidate = new DateTime("first day of {$year}-{$month}");
+    $counter = 0;
+    while ($candidate->format('w') != $targetDay) {
+      $candidate->modify('+1 day');
+      logIt("A {$candidate->format('w D d M Y')} ? {$targetDay}");
+    }
+    $candidate->modify('+' . ($nth) . ' weeks');
+  }
+  logIt("a1 {$candidate->format('w D d M Y')} <= {$lastDate->format('w D d M Y')}");
+  // If that date hasn't passed yet, use it — otherwise advance by $every months
+  if ($candidate <= $lastDate) {
+    $date->modify("+{$every} months");
+    $month = (int)$date->format('n');
+    $year  = (int)$date->format('Y');
+    if ($nth === 3) { // last
+      $candidate = new DateTime("last {$weekday} of {$date->format('F Y')}");
+    } else {
+      $candidate = new DateTime("first day of {$year}-{$month}");
+      while ($candidate->format('w') != $targetDay) {
+        $candidate->modify('+1 day');
+        logIt("B {$candidate->format('w D d M Y')} ? {$targetDay}");
+      }
+      $candidate->modify('+' . ($nth) . ' weeks');
+      logIt("C {$candidate->format('w D d M Y')} + {$nth} weeks ?why?");
+
+    }
+  }
+
+  return $candidate->format('Ymd');
+}
+

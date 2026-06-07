@@ -10,6 +10,21 @@
   <input type="text" name="code" id="code" placeholder="Share this with club members" value="{{code}}" />  
   <label for="name">Name for events</label>
   <input type="text" name="sectionCaption" id="sectionCaption" placeholder="event, meeting, gathering etc.." value="{{sectionCaption}}" />  
+  <label for="nth">Events occur every</label>
+  <div class="row row-gap">
+    <select id="nth" name="nth" class="small-select">
+      {{nths}}
+    </select>
+    <select id="day" name="day" class="small-select">
+      {{days}}
+    </select>
+    <select id="every" name="every" class="small-select">
+      {{everys}}
+    </select>
+    <select id="unit" name="unit" class="small-select">
+      {{units}}
+    </select>
+  </div>
   <label for="name">Topic of the club</label>
   <input type="text" name="thingCaption" id="thingCaption" placeholder="book, movie, wine, piece of music etc.." value="{{thingCaption}}" />  
   <label for="members">Members</label>

@@ -53,6 +53,10 @@ a:hover {
   flex-direction: row;
 }
 
+.row-gap {
+  gap: .5rem;
+}
+
 .datebox {
   background-color: rgba(255, 255, 255, .15);
   padding: .5rem;
