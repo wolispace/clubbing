@@ -59,6 +59,10 @@ function showAll(yearsBack) {
   window.location = yearsBack >= 1 ? `${base}&all=${yearsBack}` : base;
 }
 
+function newClub() {
+  editPage();
+}
+
 async function getJson(params) {
     moveOverlay(4);
     const response = await fetch(`?j=${JSON.stringify(params)}`);

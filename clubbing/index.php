@@ -29,7 +29,7 @@ function pageParams($params) {
       $params['content'] = formatClubList(getClubs());
       $params['template'] = 'home';
       $params['name'] = $app['name'];
-      $params['footer'] = 'NO'; 
+      $params['footer'] = '<div class="button" onclick="newClub()">Add your club</div>'; 
       break;
     // new case for each special page   
     default: // page defined so get its content
@@ -49,8 +49,10 @@ function getContent($params) {
   $data = loadJson($file);
   $data = array_merge($params, $data);
   if (empty($data)) {
-    $params['name'] = 'Club not found';
-    $params['content'] = '';   
+    $params['name'] = 'New club';
+    $params['acronym'] = 'NC';
+    $params['content'] = formatSections($data);
+    $params['pagebuttons'] = pageButtons($data);
   } else {
     $params['name'] = $data['name'];
     $params['sectionCaption'] = $data['sectionCaption'];
@@ -231,7 +233,7 @@ function loadDataForEditing($params) {
   $file = "{$app['clubFolder']}{$params['page']}.json";
   $data = loadJson($file);
   if (empty($data)) {
-    return ['error' => 'Club not found'];
+    $data = [];
   }
   $html = '';
   switch ($params['type']) {
@@ -252,6 +254,7 @@ function loadDataForEditing($params) {
         // default section details like next date
         $sectionKeys = array_keys($data['sections']);
         $highestSection = array_pop($sectionKeys);
+        $highestSection = empty($highestSection) ? date('Ymd') : $highestSection;
         $params['section'] = nextDate($highestSection, $data);
       }
       $section['section'] = $params['section'];       
@@ -317,7 +320,9 @@ function saveDataFromEditing($params) {
   $data = loadJson($file);
   logIt("Saving " . json_encode($params));
   if (empty($data)) {
-    return ['error' => 'Club not found'];
+    $params['page'] = buildHandle($params);
+    $file = "{$app['clubFolder']}{$params['page']}.json";
+    $data = [];
   }
   switch ($params['type']) {
   case 'page':
@@ -342,6 +347,24 @@ function saveDataFromEditing($params) {
 
   saveJson($data, $file);
   return ["status" => "ok"];
+}
+
+function buildHandle($params) {
+  global $app;
+  $page = preg_replace("\W", '', $params['page']);
+  if (empty($params['oldpage'])) {
+    // new so make sure its not clashing..
+    $counter = 0;
+    $file = "{$app['clubFolder']}{$page}.json";
+    while (file_exists($file)) {
+      $counter++;
+      $file = "{$app['clubFolder']}{$page}{$counter}.json";
+    }
+    return "{$page}{$counter}";
+  } else {
+    // no change
+    return $params['oldpage'];
+  }
 }
 
 function encodeList($list) {
