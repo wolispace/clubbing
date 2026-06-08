@@ -221,6 +221,8 @@ form {
 }
 
 .pagebuttons {
+  display: flex;
+  gap: .5rem;
   padding: 1rem;
 }
 

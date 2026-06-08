@@ -95,19 +95,30 @@ function formatSections($data) {
 
 function pageButtons($data) {
   $html = '';
+  $buttons = [];
   $params = [
-    'template' => 'page_button', 
-    'onclick' => 'editSection()', 
-    'caption'=> "Add a new {$data['sectionCaption']}"
-    ];
-  $html .= buildHtml($params);
-  $params = [
-    'template' => 'page_button', 
-    'onclick' => 'showAll()', 
-    'caption'=> "Show hold year"
-    ];
-  $html .= buildHtml($params);
-  return $html;
+  'template' => 'page_button',
+  'sectionCaption' => $data['sectionCaption'],
+  'all' => $data['all']
+  ]; 
+
+  if (empty($params['all'])) {
+    $params['onclick'] = 'editSection()'; 
+    $params['caption'] = "Add a new {$params['sectionCaption']}";
+    $html .= buildHtml($params);
+    $params['onclick'] = 'showAll(1)'; 
+    $params['caption'] = "Show whole year";
+    $html .= buildHtml($params);
+  } else {
+    $params['all']++;
+    $params['onclick'] = "showAll({$params['all']})"; 
+    $params['caption'] = "Show previous year";
+    $html .= buildHtml($params);
+    $params['onclick'] = "showAll(0)"; 
+    $params['caption'] = "Show current only";
+    $html .= buildHtml($params);
+  } 
+    return $html;
 }
 
 function getSelected($list, $selected) {

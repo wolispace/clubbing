@@ -54,6 +54,11 @@ async function addThing(section) {
   form.insertAdjacentHTML('beforeend', json.html);
 }
 
+function showAll(yearsBack) {
+  const base = window.location.href.split('&')[0];
+  window.location = yearsBack >= 1 ? `${base}&all=${yearsBack}` : base;
+}
+
 async function getJson(params) {
     moveOverlay(4);
     const response = await fetch(`?j=${JSON.stringify(params)}`);
